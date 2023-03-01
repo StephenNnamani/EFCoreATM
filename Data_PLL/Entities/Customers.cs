@@ -21,7 +21,7 @@ namespace Data_PLL.Entities
 
 
 
-        public IEnumerable<TransactionHistory> TransactionHistories { get; set; } = new List<TransactionHistory>();
+        public IEnumerable<string> TransactionHistories { get; set; } = new List<string>();
 
     }
 }
