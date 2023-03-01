@@ -53,7 +53,8 @@ public class Program
             Console.WriteLine("2. Withdraw");
             Console.WriteLine("3. Deposit");
             Console.WriteLine("4. Transfer");
-            Console.WriteLine("5. Exit");
+            Console.WriteLine("5. Transaction History");
+            LineAndColorModes.Red("0. Exit");
 
             int option;
             while (!int.TryParse(Console.ReadLine(), out option))
@@ -66,7 +67,7 @@ public class Program
                 case 1:
                     LineAndColorModes.AnimationSlide();
                     LineAndColorModes.Services("Check Balance");
-                    await customerOperation.CheckBalanceAsync(loggedUser.AccountNumber, loggedUser.Pin);
+                    customerOperation.CheckBalanceAsync(loggedUser);
                     LineAndColorModes.Yellow("Press any key to continue");
                     Console.ReadKey();
                     Console.Clear();
@@ -82,7 +83,7 @@ public class Program
                         LineAndColorModes.Red("Invalid amount. Please enter a number.");
                         goto a;
                     }
-                    await customerOperation.WithdrawAsync(loggedUser.AccountNumber, loggedUser.Pin, withdrawAmount);
+                    await customerOperation.WithdrawAsync(loggedUser, withdrawAmount);
                     LineAndColorModes.Yellow("Press any key to continue");
                     Console.ReadKey();
                     Console.Clear();
@@ -98,7 +99,7 @@ public class Program
                         LineAndColorModes.Red("Invalid amount. Please enter a number.");
                         goto b;
                     }
-                    await customerOperation.DepositAsync(loggedUser.AccountNumber, loggedUser.Pin, depositAmount);
+                    await customerOperation.DepositAsync(loggedUser, depositAmount);
                     LineAndColorModes.Yellow("Press any key to continue");
                     Console.ReadKey();
                     Console.Clear();
@@ -116,12 +117,19 @@ public class Program
                     }
                     Console.Write("Enter recipient's account number: ");
                     string recipientAccountNumber = Console.ReadLine();
-                    await customerOperation.TransferAsync(loggedUser.AccountNumber, loggedUser.Pin, recipientAccountNumber, transferAmount);
+                    await customerOperation.TransferAsync(loggedUser, recipientAccountNumber, transferAmount);
                     LineAndColorModes.Yellow("Press any key to continue");
                     Console.ReadKey();
                     Console.Clear();
                     break;
                 case 5:
+                    var histories = await customerOperation.TransactionHistoryAsync(loggedUser);
+                    foreach(var history in histories)
+                    {
+                        Console.WriteLine(history.ToString());
+                    }
+                    return;
+                case 0:
                     Console.WriteLine("Exiting...");
                     LineAndColorModes.AnimationSlide();
                     Environment.Exit(0);
