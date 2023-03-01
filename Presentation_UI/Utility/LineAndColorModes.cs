@@ -26,17 +26,23 @@ namespace Presentation_UI.Utility
             Console.ResetColor();
         }
 
-        public static void Yellow() 
+        public static void Yellow(string str) 
         {
             Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.WriteLine(str);
+            Console.ResetColor();
         }
-        public static void Red()
+        public static void Red(string str)
         {
             Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine(str);
+            Console.ResetColor();
         }
-        public static void Cyan()
+        public static void Cyan(string str)
         {
             Console.ForegroundColor = ConsoleColor.Cyan;
+            Console.WriteLine(str);
+            Console.ResetColor();
         }
 
         public static void AnimationSlide()
@@ -46,8 +52,7 @@ namespace Presentation_UI.Utility
             {
                 Console.Write("-");
                 Thread.Sleep(60);
-                Yellow();
-                Console.Write("-");
+                Cyan("-");
                 Thread.Sleep(60);
 
             }

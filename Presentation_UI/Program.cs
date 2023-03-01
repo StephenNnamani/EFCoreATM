@@ -26,14 +26,17 @@ public class Program
 
             if (string.IsNullOrEmpty(accountNumber) || string.IsNullOrEmpty(pin))
             {
-                Console.WriteLine("Invalid account number or PIN. Please try again.");
+                Console.WriteLine("Invalid account number or PIN. Please try again. Press any key to continue");
+                Console.ReadKey();
+                Console.Clear();
                 continue;
             }
 
             loggedUser = await customerOperation.Login(accountNumber, pin);
             if (loggedUser == null)
             {
-                Console.WriteLine("Invalid account number or PIN. Please try again.");
+                Console.WriteLine("Invalid account number or PIN. Please try again. Press any key to continue");
+                Console.ReadKey();
                 continue;
             }
             Console.Clear();
@@ -55,7 +58,7 @@ public class Program
             int option;
             while (!int.TryParse(Console.ReadLine(), out option))
             {
-                Console.WriteLine("Invalid option. Please enter a number.");
+                LineAndColorModes.Red("Invalid option. Please enter a number.");
             }
 
             switch (option)
@@ -64,51 +67,57 @@ public class Program
                     LineAndColorModes.AnimationSlide();
                     LineAndColorModes.Services("Check Balance");
                     await customerOperation.CheckBalanceAsync(loggedUser.AccountNumber, loggedUser.Pin);
-                    Console.WriteLine("Press any key to continue");
+                    LineAndColorModes.Yellow("Press any key to continue");
                     Console.ReadKey();
                     Console.Clear();
                     break;
                 case 2:
                     LineAndColorModes.AnimationSlide();
+                    a:
                     LineAndColorModes.Services("Withdraw");
                     Console.Write("Enter the amount to withdraw: ");
                     decimal withdrawAmount;
-                    while (!decimal.TryParse(Console.ReadLine(), out withdrawAmount))
+                    if (!decimal.TryParse(Console.ReadLine(), out withdrawAmount))
                     {
-                        Console.WriteLine("Invalid amount. Please enter a number.");
+                        LineAndColorModes.Red("Invalid amount. Please enter a number.");
+                        goto a;
                     }
                     await customerOperation.WithdrawAsync(loggedUser.AccountNumber, loggedUser.Pin, withdrawAmount);
-                    Console.WriteLine("Press any key to continue");
+                    LineAndColorModes.Yellow("Press any key to continue");
                     Console.ReadKey();
                     Console.Clear();
                     break;
                 case 3:
                     LineAndColorModes.AnimationSlide();
+                    b:
                     LineAndColorModes.Services("Deposit");
                     Console.WriteLine("Enter the amount to deposit: ");
                     decimal depositAmount;
-                    while (!Decimal.TryParse(Console.ReadLine(), out depositAmount))
+                    if (!Decimal.TryParse(Console.ReadLine(), out depositAmount))
                     {
-                        Console.WriteLine("Invalid amount. Please enter a number.");
+                        LineAndColorModes.Red("Invalid amount. Please enter a number.");
+                        goto b;
                     }
                     await customerOperation.DepositAsync(loggedUser.AccountNumber, loggedUser.Pin, depositAmount);
-                    Console.WriteLine("Press any key to continue");
+                    LineAndColorModes.Yellow("Press any key to continue");
                     Console.ReadKey();
                     Console.Clear();
                     break;
                 case 4:
                     LineAndColorModes.AnimationSlide();
+                    c:
                     LineAndColorModes.Services("Transfer");
                     Console.Write("Enter the amount to transfer: ");
                     decimal transferAmount;
-                    while (!Decimal.TryParse(Console.ReadLine(), out transferAmount))
+                    if (!Decimal.TryParse(Console.ReadLine(), out transferAmount))
                     {
-                        Console.WriteLine("Invalid amount. Please enter a number.");
+                        LineAndColorModes.Red("Invalid amount. Please enter a number.");
+                        goto c;
                     }
                     Console.Write("Enter recipient's account number: ");
                     string recipientAccountNumber = Console.ReadLine();
                     await customerOperation.TransferAsync(loggedUser.AccountNumber, loggedUser.Pin, recipientAccountNumber, transferAmount);
-                    Console.WriteLine("Press any key to continue");
+                    LineAndColorModes.Yellow("Press any key to continue");
                     Console.ReadKey();
                     Console.Clear();
                     break;
@@ -118,7 +127,7 @@ public class Program
                     Environment.Exit(0);
                     return;
                 default:
-                    Console.WriteLine("Invalid option. Please enter a number between 1 and 4.");
+                    LineAndColorModes.Red("Invalid option. Please enter a number between 1 and 4.");
                     break;
             }
         }

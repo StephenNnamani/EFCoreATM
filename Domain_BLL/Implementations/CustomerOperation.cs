@@ -137,6 +137,11 @@ namespace Domain_BLL.Implementations
                     Console.WriteLine("Insufficient funds.");
                     return null;
                 }
+                if(amount != (int)amount)
+                {
+                    Console.WriteLine("You can't withdraw decimals");
+                    return null;
+                }
 
                 customer.Balance -= amount;
                 await context.SaveChangesAsync();
