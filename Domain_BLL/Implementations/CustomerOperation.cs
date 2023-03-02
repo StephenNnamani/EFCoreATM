@@ -63,11 +63,9 @@ namespace Domain_BLL.Implementations
 
         public async Task<CustomerViewModel> DepositAsync(Customers user, decimal amount)
         {
-
             using var context = _atmDb.CreateDbContext(null);
 
-            var customer = user;
-
+            var customer = await context.Customers.FirstOrDefaultAsync(x => x.AccountNumber == user.AccountNumber && x.Pin == user.Pin);
 
             if (customer == null)
             {
@@ -86,19 +84,19 @@ namespace Domain_BLL.Implementations
             var customerViewModel = new CustomerViewModel
             {
 
-                AccountNumber = user.AccountNumber,
-                Balance = user.Balance
+                AccountNumber = customer.AccountNumber,
+                Balance = customer.Balance
             };
 
-            history.CustomersId = user.Id;
+            history.CustomersId = customer.Id;
             history.TransactionType = "Deposit";
             history.TransactionDate = DateTime.UtcNow;
-            history.Balance = user.Balance;
+            history.Balance = customer.Balance;
 
             customer.TransactionHistories.Append(history);
             await context.SaveChangesAsync();
 
-            Console.WriteLine($"You have successfully made a deposit of {amount}. New balance is {user.Balance:C}.");
+            Console.WriteLine($"You have successfully made a deposit of {amount}. New balance is {customer.Balance:C}.");
             return customerViewModel;
         }
 
@@ -122,10 +120,7 @@ namespace Domain_BLL.Implementations
         {
             using (var context = _atmDb.CreateDbContext(null))
             {
-
-                var customer = user;
-
-               
+                var customer = await context.Customers.FirstOrDefaultAsync(x => x.AccountNumber == user.AccountNumber && x.Pin == user.Pin);
 
                 if (customer == null)
                 {
@@ -169,34 +164,35 @@ namespace Domain_BLL.Implementations
                     AccountNumber = customer.AccountNumber,
                     Balance = customer.Balance
                 };
-                history.CustomersId = user.Id;
+                history.CustomersId = customer.Id;
                 history.TransactionType = "Withdraw";
                 history.TransactionDate = DateTime.UtcNow;
-                history.Balance = user.Balance;
+                history.Balance = customer.Balance;
 
                 customer.TransactionHistories.Append(history);
                 await context.SaveChangesAsync();
 
-                Console.WriteLine($"Withdrawal of {amount} successful. New balance is {user.Balance:C}.");
+                Console.WriteLine($"Withdrawal of {amount} successful. New balance is {customer.Balance:C}.");
                 return customerViewModel;
             }
         }
 
 
-        public void CheckBalanceAsync(Customers user)
+        public async Task CheckBalanceAsync(Customers user)
         {
             using (var context = _atmDb.CreateDbContext(null))
             {
+                var customer = await context.Customers.FirstOrDefaultAsync(x => x.AccountNumber == user.AccountNumber && x.Pin == user.Pin);
                 try
                 {
 
-                    if (user == null)
+                    if (customer == null)
                     {
                         Console.WriteLine("Invalid account number or PIN.");
                         return;
                     }
 
-                    Console.WriteLine($"Account balance for {user.AccountName}: {user.Balance:C}");
+                    Console.WriteLine($"Account balance for {customer.AccountName}: {customer.Balance:C}");
                 }
                 catch (InvalidOperationException)
                 {
@@ -207,6 +203,7 @@ namespace Domain_BLL.Implementations
         }
         public async Task<bool> TransferAsync(Customers user, string recipientAccountNumber, decimal amount)
         {
+
             using (var context = _atmDb.CreateDbContext(null))
             {
                 if (user == null)
@@ -242,21 +239,21 @@ namespace Domain_BLL.Implementations
                     Console.WriteLine("You cannot transfer funds to your own account.");
                     return false;
                 }
-
-                user.Balance -= amount;
+                var customer = await context.Customers.FirstOrDefaultAsync(x => x.AccountNumber == user.AccountNumber && x.Pin == user.Pin);
+                customer.Balance -= amount;
                 recipient.Balance += amount;
 
                 await context.SaveChangesAsync();
-                history.CustomersId = user.Id;
+                history.CustomersId = customer.Id;
                 history.TransactionType = "Transfer";
                 history.TransactionDate = DateTime.UtcNow;
-                history.Balance = user.Balance;
+                history.Balance = customer.Balance;
                 history.CustomersNavigation = recipient;
 
-                user.TransactionHistories.Append(history);
+                customer.TransactionHistories.Append(history);
                 await context.SaveChangesAsync();
 
-                Console.WriteLine($"Transfer successful. {user.AccountName} transferred {amount:C} to {recipient.AccountName}.");
+                Console.WriteLine($"Transfer successful. {customer.AccountName} transferred {amount:C} to {recipient.AccountName}.");
 
                 return true;
             }
